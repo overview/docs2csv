@@ -135,11 +135,11 @@ def processFile(filename, options)
 		# - uid, a hash of the filename (including relative path)
 		# - text, the extracted text
 		# - title, the filename (relative)  
-		# - url, a file:// URL pointing to the doc on disk (absolute)
+		# - url, an http://localhost:8000 URL to the relative path
 		if options.process
 			text = cleanText(extractTextFromFile(filename, options))
 			title = filename
-			url = "file://" + File.expand_path(filename)
+			url = "http://localhost:8000/" + filename
 			uid = Digest::MD5.hexdigest(filename)
 			
 			options.csv << [uid, text, title, url]
