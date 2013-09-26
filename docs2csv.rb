@@ -20,7 +20,8 @@ require 'json'
 # text extraction, directory recursion, file matching
   
 # is there actually any content to this text? Used to trigger OCR
-# currently, just check for at least one letter
+# currently, just check for at least one letter. Scans saved to PDF
+# often extract as just a series of form feed (\f) characters
 def emptyText(text)
 	(text =~ /[azAZ]/) == nil
 end
@@ -36,10 +37,20 @@ def extractTextFromPDF(filename, options)
 
 	text = `"#{pdftotextexec}" "#{filename}" -`
 	if options.force_ocr or (emptyText(text) and options.ocr)
-		puts "Found file to OCR #{filename}"
 		text += ocrPDF(filename)
 	end
 	text
+end
+
+# OCR a specific file.
+# Requires a tmp path to where the output file will be written (won't be deleted after use)
+# More or less just a tesseract call, but we turn on orientation detection.
+# This requires the orientation "langauge", not installed by default.
+# So we include in our repo, and export environment variables to point to it
+def ocrFile(filename, tmpdir)
+	ENV['TESSDATA_PREFIX'] = File.absolute_path(File.dirname(__FILE__))
+	system("tesseract -psm 1 -l eng \"#{filename}\" \"#{tmpdir}/output\"")
+	File.open("#{tmpdir}/output.txt").read	
 end
 
 # render and OCR a PDF. Requires splitting it into pages and concatenating
@@ -52,8 +63,7 @@ def ocrPDF(filename)
   			if imgfile != "." && imgfile != ".."	
 	  			puts "OCRing file #{imgfile}"
 	  			begin
-		  			`tesseract "#{dir}/#{imgfile}" "#{dir}/output"`
-	  				text += File.open("#{dir}/output.txt").read	+ '\n'
+		  			text += ocrFile("#{dir}/#{imgfile}",dir) + '\n'
 	  			rescue
 	  				puts "OCR Error, skipping page."
 	  			end
@@ -68,12 +78,7 @@ def ocrImage(filename)
 	text = ""
 	Dir.mktmpdir {|dir|
 	  	puts "OCRing file #{filename}"
-	  	begin
-		  	`tesseract "#{filename}" "#{dir}/output"`
-	  		text = File.open("#{dir}/output.txt").read
-	  	rescue
- 			puts "OCR Error, skipping image."
-  		end
+	  	text = ocrFile(filename, dir)
 	}
 	text
 end
@@ -103,7 +108,7 @@ end
 # Execute callfn for each file in direname where matchfn returns true, recurse into dirs if recurse is true
 def scanDir(dirname, matchfn, callfn, recurse)
 	Dir.foreach(dirname) do |filename|
-		fullfilename = dirname + "/" + filename;
+		fullfilename = dirname + filename;
 		if File.directory?(fullfilename)
 			if recurse && filename != "." && filename != ".."		# don't infinite loop kthx
 				scanDir(fullfilename, matchfn, callfn, recurse)
