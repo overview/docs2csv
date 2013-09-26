@@ -108,7 +108,7 @@ end
 # Execute callfn for each file in direname where matchfn returns true, recurse into dirs if recurse is true
 def scanDir(dirname, matchfn, callfn, recurse)
 	Dir.foreach(dirname) do |filename|
-		fullfilename = dirname + filename;
+		fullfilename = dirname + '/' + filename;
 		if File.directory?(fullfilename)
 			if recurse && filename != "." && filename != ".."		# don't infinite loop kthx
 				scanDir(fullfilename, matchfn, callfn, recurse)
