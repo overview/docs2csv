@@ -5,10 +5,11 @@
 # Example usage:
 #    ruby docs2csv.rb dir-full-of-PDFs output.csv
 #
-# Requires docsplit, http://documentcloud.github.com/docsplit/ 
+# Requires tesseract and poppler for OCR functionality
  
 require 'rubygems'
 require 'Digest'
+require 'tmpdir'
 require 'ostruct'
 require 'optparse'
 require 'uri'
@@ -18,16 +19,71 @@ require 'json'
 # ------------------------------------------- Modules, functions ----------------------------------------
 # text extraction, directory recursion, file matching
   
- # extract text from specified PDF
+# strip characters to make sure the CSV is valid  
+def cleanText(text)
+	text.gsub("\f", "\n") # turn \f into \n
+end
+
+# is there actually any content to this text? Used to trigger OCR
+# currently, just check for at least one letter
+def emptyText(text)
+	(text =~ /[azAZ]/) == nil
+end
+
+# extract text from specified PDF
 # We use pdftotext. On Windows, we expect it to be located where we are
-def extractTextFromPDF(filename)
+def extractTextFromPDF(filename, options)
 	if ENV['OS'] == "Windows_NT"
 		pdftotextexec = File.expand_path(File.dirname(__FILE__)) + "/pdftotext.exe"
 	else
-		pdftotextexec = "pdftotext"
+		pdftotextexec = "/usr/local/bin/pdftotext"
 	end
+
 	text = `"#{pdftotextexec}" "#{filename}" -`
+	text = cleanText(text)
+	if options.force_ocr or (emptyText(text) and options.ocr)
+		puts "Found file to OCR #{filename}"
+		text += ocrPDF(filename)
+	end
+	text
 end
+
+# render and OCR a PDF. Requires splitting it into pages and concatenating
+def ocrPDF(filename)
+	text = ""
+	#  extract all images in the PDF to a temp directory, then OCR from there
+	Dir.mktmpdir {|dir|
+  		`pdfimages "#{filename}" "#{dir}/img"`
+  		Dir.foreach(dir) do |imgfile|
+  			if imgfile != "." && imgfile != ".."	
+	  			puts "OCRing file #{imgfile}"
+	  			begin
+		  			`tesseract "#{dir}/#{imgfile}" "#{dir}/output"`
+	  				text += File.open("#{dir}/output.txt").read	+ '\n'
+	  			rescue
+	  				puts "OCR Error, skipping image"
+	  			end
+	  		end
+  		end
+	}
+	text
+end
+
+# ocr a single image file
+def ocrImage(filename)
+	text = ""
+	Dir.mktmpdir {|dir|
+	  	puts "OCRing file #{filename}"
+	  	begin
+		  	`tesseract "#{filename}" "#{dir}/output"`
+	  		text = File.open("#{dir}/output.txt").read
+	  	rescue
+ 			puts "OCR Error, skipping image"
+  		end
+	}
+	text
+end
+
 
 # Extract text using Apache Tika. Handles many file formats, including MS Office, HTML
 def extractTextTika(filename)
@@ -36,10 +92,12 @@ end
 
 # extract text from specified file
 # Format dependent
-def extractTextFromFile(filename)
+def extractTextFromFile(filename, options)
 	format = File.extname(filename)
 	if format == ".pdf"
-		extractTextFromPDF(filename)
+		extractTextFromPDF(filename, options)
+	elsif format == ".jpg"
+		ocrImage(filename)
 	elsif format == ".txt"
 		File.open(filename).read
 	else 
@@ -65,7 +123,8 @@ end
 
 # Based on file extension, is this a document file?
 def matchFn(filename)
-	return [".txt", ".pdf", ".html", "htm", ".ppt", ".pptx", ".xls", ".xlsx"].include? File.extname(filename)
+	formats = [".txt", ".pdf", ".html", "htm", ".ppt", ".pptx", ".xls", ".xlsx", ".jpg"]
+	return formats.include? File.extname(filename)
 end
 
 
@@ -80,7 +139,7 @@ def processFile(filename, options)
 	# - title, the filename (relative)  
 	# - url, a file:// URL pointing to the doc on disk (absolute)
 	if options.process
-		text = extractTextFromFile(filename)
+		text = extractTextFromFile(filename, options)
 		title = filename
 		url = "file://" + File.expand_path(filename)
 		uid = Digest::MD5.hexdigest(filename)
@@ -94,12 +153,22 @@ end
 options = OpenStruct.new
 options.process = true
 options.recurse = false
+options.ocr = false
+options.force_ocr = false
 
 OptionParser.new do |opts|
-  	opts.banner = "Usage: docs2csv.rb [-r] [-l] directory outputfile"
+  	opts.banner = "Usage: docs2csv.rb [options] directory outputfile"
 
 	opts.on("-l", "--list", "Only list files, do not process") do |v|
 		options.process = false
+	end	  
+
+	opts.on("-o", "--ocr", "OCR pdfs that do not contain text") do |v|
+		options.ocr = true
+	end	  
+
+	opts.on("-f", "--force-ocr", "Force OCR on all pdfs") do |v|
+		options.force_ocr = true
 	end	  
 
 	opts.on("-r", "--recurse", "Scan directory recursively") do |v|
