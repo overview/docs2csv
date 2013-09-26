@@ -15,7 +15,7 @@ First you will need to install:
 
   - Tesseract, for OCR
 
-    [aptitude | port | brew] install [tesseract | tesseract-ocr] 
+    ```[aptitude | port | brew] install [tesseract | tesseract-ocr]```
 
     Without Tesseract installed, you'll still be able to extract text from documents, but you won't be able to automatically OCR them.
 
@@ -31,7 +31,7 @@ The output file will contain the extracted text from each file, plus URL links t
 
 To serve these files so that the "source file" links work in Oveview, run
 
-    ```python -m SimpleHTTPServer```
+    python -m SimpleHTTPServer
 
 from the same directory where you ran docs2csv from (file URLs are relative)
 
