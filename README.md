@@ -6,12 +6,17 @@ Scan a folder of document files of all types and extract the text into a CSV sui
 First you will need to install:
   - Poppler, for pdfimages 
     On Linux, use aptitude, apt-get or yum:
-      aptitude install poppler-utils poppler-data
+
+    ```aptitude install poppler-utils poppler-data```
+
     On the Mac, you can install from source or use MacPorts:
-      sudo port install poppler | brew install poppler
+
+    ```sudo port install poppler | brew install poppler```
 
   - Tesseract, for OCR
+
     [aptitude | port | brew] install [tesseract | tesseract-ocr] 
+
     Without Tesseract installed, you'll still be able to extract text from documents, but you won't be able to automatically OCR them.
 
 Usage: 
@@ -25,7 +30,9 @@ Usage:
 The output file will contain the extracted text from each file, plus URL links to the original file, of the form http://localhost:8000/[filename]
 
 To serve these files so that the "source file" links work in Oveview, run
-   python -m SimpleHTTPServer
+
+    ```python -m SimpleHTTPServer```
+
 from the same directory where you ran docs2csv from (file URLs are relative)
 
 
