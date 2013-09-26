@@ -29,6 +29,11 @@ def extractTextFromPDF(filename)
 	text = `"#{pdftotextexec}" "#{filename}" -`
 end
 
+# Extract text using Apache Tika. Handles many file formats, including MS Office, HTML
+def extractTextTika(filename)
+	text = `java -jar tika-app-1.4.jar -t "#{filename}"` 
+end
+
 # extract text from specified file
 # Format dependent
 def extractTextFromFile(filename)
@@ -37,6 +42,8 @@ def extractTextFromFile(filename)
 		extractTextFromPDF(filename)
 	elsif format == ".txt"
 		File.open(filename).read
+	else 
+		extractTextTika(filename)
 	end
 end
 
@@ -58,7 +65,7 @@ end
 
 # Based on file extension, is this a document file?
 def matchFn(filename)
-	return [".txt", ".pdf"].include? File.extname(filename)
+	return [".txt", ".pdf", ".html", "htm", ".ppt", ".pptx", ".xls", ".xlsx"].include? File.extname(filename)
 end
 
 
