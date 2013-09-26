@@ -19,11 +19,6 @@ require 'json'
 # ------------------------------------------- Modules, functions ----------------------------------------
 # text extraction, directory recursion, file matching
   
-# strip characters to make sure the CSV is valid  
-def cleanText(text)
-	text.gsub("\f", "\n") # turn \f into \n
-end
-
 # is there actually any content to this text? Used to trigger OCR
 # currently, just check for at least one letter
 def emptyText(text)
@@ -40,7 +35,6 @@ def extractTextFromPDF(filename, options)
 	end
 
 	text = `"#{pdftotextexec}" "#{filename}" -`
-	text = cleanText(text)
 	if options.force_ocr or (emptyText(text) and options.ocr)
 		puts "Found file to OCR #{filename}"
 		text += ocrPDF(filename)
@@ -61,7 +55,7 @@ def ocrPDF(filename)
 		  			`tesseract "#{dir}/#{imgfile}" "#{dir}/output"`
 	  				text += File.open("#{dir}/output.txt").read	+ '\n'
 	  			rescue
-	  				puts "OCR Error, skipping image"
+	  				puts "OCR Error, skipping page."
 	  			end
 	  		end
   		end
@@ -78,7 +72,7 @@ def ocrImage(filename)
 		  	`tesseract "#{filename}" "#{dir}/output"`
 	  		text = File.open("#{dir}/output.txt").read
 	  	rescue
- 			puts "OCR Error, skipping image"
+ 			puts "OCR Error, skipping image."
   		end
 	}
 	text
@@ -123,28 +117,35 @@ end
 
 # Based on file extension, is this a document file?
 def matchFn(filename)
-	formats = [".txt", ".pdf", ".html", "htm", ".ppt", ".pptx", ".xls", ".xlsx", ".jpg"]
+	formats = [".txt", ".pdf", ".html", "htm", ".doc", ".docx", ".ppt", ".pptx", ".xls", ".xlsx", ".jpg"]
 	return formats.include? File.extname(filename)
 end
 
+# strip characters to make sure the CSV is valid  
+def cleanText(text)
+	text.gsub("\f", "\n") # turn \f into \n
+end
 
 # upload/extract text from a single file
 # precondition: File.exists?(filename)
 def processFile(filename, options)
 	puts "Processing #{filename}"
-
-	# We generate four fields for each document:
-	# - uid, a hash of the filename (including relative path)
-	# - text, the extracted text
-	# - title, the filename (relative)  
-	# - url, a file:// URL pointing to the doc on disk (absolute)
-	if options.process
-		text = extractTextFromFile(filename, options)
-		title = filename
-		url = "file://" + File.expand_path(filename)
-		uid = Digest::MD5.hexdigest(filename)
-		
-		options.csv << [uid, text, title, url]
+	begin
+		# We generate four fields for each document:
+		# - uid, a hash of the filename (including relative path)
+		# - text, the extracted text
+		# - title, the filename (relative)  
+		# - url, a file:// URL pointing to the doc on disk (absolute)
+		if options.process
+			text = cleanText(extractTextFromFile(filename, options))
+			title = filename
+			url = "file://" + File.expand_path(filename)
+			uid = Digest::MD5.hexdigest(filename)
+			
+			options.csv << [uid, text, title, url]
+		end
+	rescue
+		puts "Error processing #{filename}, skipping."
 	end
 end
 
