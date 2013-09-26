@@ -1,10 +1,13 @@
 docs2csv
 ========
 
-Scan a folder of document files of all types and extract the text into a CSV suitable for import into Overview.
+Scan a folder of document files of all types and extract the text into a CSV suitable for import into Overview. Currently supports PDF, JPG, HTML, and Microsoft Word, PowerPoint and Excel. 
+
+PDFs will be OCRd if -o set and they contain no text, or always if -f set. 
+JPGs will allways be OCRd.
 
 First you will need to install:
-  - Poppler, for pdfimages 
+  - Poppler, for pdfimages (and pdftotext on some systems)
     On Linux, use aptitude, apt-get or yum:
 
     ```aptitude install poppler-utils poppler-data```
