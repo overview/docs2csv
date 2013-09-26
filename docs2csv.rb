@@ -8,6 +8,7 @@
 # Requires docsplit, http://documentcloud.github.com/docsplit/ 
  
 require 'rubygems'
+require 'Digest'
 require 'ostruct'
 require 'optparse'
 require 'uri'
@@ -84,7 +85,8 @@ end
 # ------------------------------------------- Process command-line args ----------------------------------------
 
 options = OpenStruct.new
-options.process = false
+options.process = true
+options.recurse = false
 
 OptionParser.new do |opts|
   	opts.banner = "Usage: docs2csv.rb [-r] [-l] directory outputfile"
@@ -106,7 +108,7 @@ unless dirname = ARGV[0]
 	exit
 end
 
-unless outputfile = ARGV[1]
+unless options.outputfile = ARGV[1]
 	puts "ERROR: no output file specified"
 	exit
 end
@@ -115,7 +117,7 @@ end
 
 # Open output CSV filename and write header
 if options.process
-	options.csv = CSV.open(options.overviewCSVfilename,"w")
+	options.csv = CSV.open(options.outputfile,"w")
 	options.csv << ["uid", "text", "title", "url"]
 end
 
