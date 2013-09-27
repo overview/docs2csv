@@ -6,7 +6,7 @@ Scan a folder of document files of all types and extract the text into a CSV sui
 PDFs will be OCRd if -o set and they contain no text, or always if -f set. 
 JPGs will allways be OCRd.
 
-First you will need to install:
+**First you will need to install**
   - Poppler, for pdfimages (and pdftotext on some systems)
     On Linux, use aptitude, apt-get or yum:
 
@@ -22,20 +22,23 @@ First you will need to install:
 
     Without Tesseract installed, you'll still be able to extract text from documents, but you won't be able to automatically OCR them.
 
-Usage: 
-    ruby docs2csv.rb [-l] [-r] [-o] [-f] dir-full-of-PDFs output.csv
+**Typical usage** 
+
+    ruby docs2csv.rb -r -o directory-to-scan output.csv
+    
+This scans the directory recursively, and OCRs any PDFs which may need it. Other options:
 
     -l, --list                       Only list files, do not process
     -r, --recurse                    Scan directory recursively
     -o, --ocr                        OCR pdfs that do not contain text
     -f, --force-ocr                  Force OCR on all pdfs
 
-The output file will contain the extracted text from each file, plus URL links to the original file, of the form http://localhost:8000/[filename]
 
-To serve these files so that the "source file" links work in Oveview, run
+**Viewing the original files from Overview**
+
+The extracted text will be shown in the Overview documetn viewer, but not the original document pages. You can view the original files in your browser via Overview's "source file" links, if you start up a simple web server like this:
 
     python -m SimpleHTTPServer
 
-from the same directory where you ran docs2csv from (file URLs are relative)
-
+The "source file" links use the URL column that docs2csv writes, which has addresses of the form  http://localhost:8000/[filename]. You need to run this server from the same directory where you originally ran docs2csv, as these file URLs are relative.
 
