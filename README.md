@@ -23,7 +23,8 @@ First you will need to install:
     Without Tesseract installed, you'll still be able to extract text from documents, but you won't be able to automatically OCR them.
 
 Usage: 
-    ruby docs2csv.rb [-l] [-r] [-o] [-f] dir-full-of-PDFs output.csv
+
+    ruby docs2csv.rb [-l] [-r] [-o] [-f] directory-to-scan output.csv
 
     -l, --list                       Only list files, do not process
     -r, --recurse                    Scan directory recursively
@@ -32,7 +33,7 @@ Usage:
 
 The output file will contain the extracted text from each file, plus URL links to the original file, of the form http://localhost:8000/[filename]
 
-To serve these files so that the "source file" links work in Oveview, run
+The extracted text will be shown in Overview. To serve the original files so that the "source file" links work in Oveview, run
 
     python -m SimpleHTTPServer
 
