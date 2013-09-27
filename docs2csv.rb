@@ -64,8 +64,10 @@ def ocrPDF(filename)
 	  			puts "OCRing file #{imgfile}"
 	  			begin
 		  			text += ocrFile("#{dir}/#{imgfile}",dir) + '\n'
-	  			rescue
+	  			rescue => error
 	  				puts "OCR Error, skipping page."
+	  				puts error.message
+	  				puts error.backtrace
 	  			end
 	  		end
   		end
@@ -149,8 +151,10 @@ def processFile(filename, options)
 			
 			options.csv << [uid, text, title, url]
 		end
-	rescue
+	rescue => error
 		puts "Error processing #{filename}, skipping."
+		puts error.message
+	  	puts error.backtrace
 	end
 end
 
