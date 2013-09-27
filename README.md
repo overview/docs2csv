@@ -22,9 +22,11 @@ First you will need to install:
 
     Without Tesseract installed, you'll still be able to extract text from documents, but you won't be able to automatically OCR them.
 
-Usage: 
+Typical usage: 
 
-    ruby docs2csv.rb [-l] [-r] [-o] [-f] directory-to-scan output.csv
+    ruby docs2csv.rb -r -o directory-to-scan output.csv
+    
+This scans the directory recursively, and OCRs any PDFs which may need it. Other options:
 
     -l, --list                       Only list files, do not process
     -r, --recurse                    Scan directory recursively
