@@ -48,7 +48,7 @@ end
 # This requires the orientation "langauge", not installed by default.
 # So we include in our repo, and export environment variables to point to it
 def ocrFile(filename, tmpdir)
-	ENV['TESSDATA_PREFIX'] = File.absolute_path(File.dirname(__FILE__))
+	ENV['TESSDATA_PREFIX'] = File.expand_path(File.dirname(__FILE__))
 	system("tesseract -psm 1 -l eng \"#{filename}\" \"#{tmpdir}/output\"")
 	File.open("#{tmpdir}/output.txt").read	
 end
