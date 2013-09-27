@@ -35,6 +35,7 @@ This scans the directory recursively, and OCRs any PDFs which may need it. Other
 
 
 **Viewing the original files from Overview**
+
 The extracted text will be shown in Overview. You can view the original files in your browser via the "source file" links, if you start up a simple web server like this:
 
     python -m SimpleHTTPServer
