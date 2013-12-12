@@ -26,8 +26,8 @@ JPGs will allways be OCRd.
 
     Ubuntu comes with ruby 1.8. You can install ruby 1.9.1 like this:
 
-    ```sudo apt-get install ruby1.9.1```
-    ```sudo update-alternatives --set ruby /usr/bin/ruby1.9.1```
+        sudo apt-get install ruby1.9.1
+        sudo update-alternatives --set ruby /usr/bin/ruby1.9.1
 
 **Typical usage** 
 
