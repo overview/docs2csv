@@ -8,7 +8,7 @@
 # Requires tesseract and poppler for OCR functionality
  
 require 'rubygems'
-require 'Digest'
+require 'digest'
 require 'tmpdir'
 require 'ostruct'
 require 'optparse'

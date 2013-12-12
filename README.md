@@ -22,6 +22,13 @@ JPGs will allways be OCRd.
 
     Without Tesseract installed, you'll still be able to extract text from documents, but you won't be able to automatically OCR them.
 
+  - Ruby 1.9.x
+
+    Ubuntu comes with ruby 1.8. You can install ruby 1.9.1 like this:
+
+    ```sudo apt-get install ruby1.9.1```
+    ```sudo update-alternatives --set ruby /usr/bin/ruby1.9.1```
+
 **Typical usage** 
 
     ruby docs2csv.rb -r -o directory-to-scan output.csv
