@@ -8,13 +8,12 @@
 # Requires tesseract and poppler for OCR functionality
  
 require 'rubygems'
-require 'Digest'
+require 'digest'
 require 'tmpdir'
 require 'ostruct'
 require 'optparse'
 require 'uri'
 require 'csv'
-require 'json'
 
 # ------------------------------------------- Modules, functions ----------------------------------------
 # text extraction, directory recursion, file matching
