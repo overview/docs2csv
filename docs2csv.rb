@@ -129,7 +129,8 @@ end
 
 # strip characters to make sure the CSV is valid  
 def cleanText(text)
-	text.gsub("\f", "\n") # turn \f into \n
+	text.gsub!("\f", "\n") # turn \f into \n
+	text.gsub("\x00", "")  # remove null bytes (See https://www.pivotaltracker.com/story/show/61360820)
 end
 
 # upload/extract text from a single file
