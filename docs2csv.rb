@@ -87,7 +87,8 @@ end
 
 # Extract text using Apache Tika. Handles many file formats, including MS Office, HTML
 def extractTextTika(filename)
-	text = `java -jar tika-app-1.4.jar -t "#{filename}"` 
+	execDir = File.expand_path(File.dirname(__FILE__))
+	text = `java -jar #{execDir}/tika-app-1.4.jar -t "#{filename}"` 
 end
 
 # extract text from specified file
@@ -204,7 +205,7 @@ end
 # Open output CSV filename and write header
 if options.process
 	options.csv = CSV.open(options.outputfile,"w")
-	options.csv << ["uid", "text", "title", "url"]
+	options.csv << ["id", "text", "title", "url"]
 end
 
 # And we're ready. Iterate, possibly recursively, through directory in question
