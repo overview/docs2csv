@@ -124,7 +124,7 @@ end
 
 # Based on file extension, is this a document file?
 def matchFn(filename)
-	formats = [".txt", ".pdf", ".html", ".htm", ".mhtml", ".mht", ".doc", ".docx", ".ppt", ".pptx", ".xls", ".xlsx", ".jpg"]
+	formats = [".txt", ".pdf", ".html", ".htm", ".mhtml", ".mht", ".doc", ".docx", ".ppt", ".pptx", ".xls", ".xlsx", ".jpg", ".rtf"]
 	return formats.include? File.extname(filename)
 end
 
