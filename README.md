@@ -4,7 +4,7 @@ docs2csv
 Scan a folder of document files of all types and extract the text into a CSV suitable for import into Overview. Currently supports PDF, JPG, HTML, and Microsoft Word, PowerPoint and Excel. 
 
 PDFs will be OCRd if -o set and they contain no text, or always if -f set. 
-JPGs will allways be OCRd.
+JPGs will be OCRd if -o set.
 
 **First you will need to install**
   - Poppler, for pdfimages (and pdftotext on some systems)
@@ -30,7 +30,7 @@ This scans the directory recursively, and OCRs any PDFs which may need it. Other
 
     -l, --list                       Only list files, do not process
     -r, --recurse                    Scan directory recursively
-    -o, --ocr                        OCR pdfs that do not contain text
+    -o, --ocr                        OCR jpgs and pdfs that do not contain text
     -f, --force-ocr                  Force OCR on all pdfs
 
 

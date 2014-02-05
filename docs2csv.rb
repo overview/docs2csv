@@ -75,12 +75,15 @@ def ocrPDF(filename)
 end
 
 # ocr a single image file
-def ocrImage(filename)
+# return empty text if OCR option is not set
+def ocrImage(filename, options)
 	text = ""
-	Dir.mktmpdir {|dir|
-	  	puts "OCRing file #{filename}"
-	  	text = ocrFile(filename, dir)
-	}
+	if options.ocr			
+		Dir.mktmpdir {|dir|
+		  	puts "OCRing file #{filename}"
+		  	text = ocrFile(filename, dir)
+		}
+	end
 	text
 end
 
@@ -98,7 +101,7 @@ def extractTextFromFile(filename, options)
 	if format == ".pdf"
 		extractTextFromPDF(filename, options)
 	elsif format == ".jpg"
-		ocrImage(filename)
+		ocrImage(filename, options)
 	elsif format == ".txt"
 		File.open(filename).read
 	else 
@@ -174,7 +177,7 @@ OptionParser.new do |opts|
 		options.process = false
 	end	  
 
-	opts.on("-o", "--ocr", "OCR pdfs that do not contain text") do |v|
+	opts.on("-o", "--ocr", "OCR image files and pdfs that do not contain text") do |v|
 		options.ocr = true
 	end	  
 
