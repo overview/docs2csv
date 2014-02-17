@@ -133,6 +133,21 @@ end
 
 # strip characters to make sure the CSV is valid  
 def cleanText(text)
+   # force clean UTF-8 encoding, if the version of Ruby we're on supports it
+   # Actually we assume UTF-8 here, may not be correct
+   if RUBY_VERSION >= "1.9"
+
+      # First, force to UTF-8 encoding
+      if text.encoding.name != "UTF-8"  
+        text = text.force_encoding('UTF-8')
+      end
+
+      # If we still don't have a valid string, re-encode
+      if !text.valid_encoding?
+        text = text.encode('UTF-16', invalid: :replace, undef: :replace).encode('UTF-8')
+      end
+
+    end	
 	text.gsub!("\f", "\n") # turn \f into \n
 	text.gsub("\x00", "")  # remove null bytes (See https://www.pivotaltracker.com/story/show/61360820)
 end
