@@ -1,7 +1,7 @@
 docs2csv
 ========
 
-Scan a folder of document files of all types and extract the text into a CSV suitable for import into Overview. Currently supports PDF, JPG, HTML, and Microsoft Word, PowerPoint and Excel. 
+Scan a folder of document files of all types and extract the text into a CSV suitable for import into Overview. Currently supports TXT, PDF, JPG, HTML, MHTML, RTF, and Microsoft Word, PowerPoint and Excel.
 
 PDFs will be OCRd if -o set and they contain no text, or always if -f set. 
 JPGs will be OCRd if -o set.
