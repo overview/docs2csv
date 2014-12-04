@@ -213,16 +213,17 @@ unless dirname = ARGV[0]
 	exit
 end
 
-unless options.outputfile = ARGV[1]
-	STDERR.write "ERROR: no output file specified\n"
-	exit
+if ARGV[1]
+    options.outputfile = File.open(ARGV[1], "w")
+else
+    options.outputfile = STDOUT
 end
 	
 # ------------------------------------------- Do it! ----------------------------------------
 
 # Open output CSV filename and write header
 if options.process
-	options.csv = CSV.open(options.outputfile,"w")
+	options.csv = CSV.new(options.outputfile)
 	options.csv << ["id", "text", "title", "url"]
 end
 
