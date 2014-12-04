@@ -60,13 +60,13 @@ def ocrPDF(filename)
   		`pdfimages "#{filename}" "#{dir}/img"`
   		Dir.foreach(dir) do |imgfile|
   			if imgfile != "." && imgfile != ".."	
-	  			puts "OCRing file #{imgfile}"
+	  			STDERR.write "OCRing file #{imgfile}\n"
 	  			begin
 		  			text += ocrFile("#{dir}/#{imgfile}",dir) + '\n'
 	  			rescue => error
-	  				puts "OCR Error, skipping page."
-	  				puts error.message
-	  				puts error.backtrace
+	  				STDERR.write "OCR Error, skipping page.\n"
+	  				STDERR.write error.message
+	  				STDERR.write error.backtrace
 	  			end
 	  		end
   		end
@@ -80,7 +80,7 @@ def ocrImage(filename, options)
 	text = ""
 	if options.ocr			
 		Dir.mktmpdir {|dir|
-		  	puts "OCRing file #{filename}"
+		  	STDERR.write "OCRing file #{filename}\n"
 		  	text = ocrFile(filename, dir)
 		}
 	end
@@ -155,7 +155,7 @@ end
 # upload/extract text from a single file
 # precondition: File.exists?(filename)
 def processFile(filename, options)
-	puts "Processing #{filename}"
+	STDERR.write "Processing #{filename}\n"
 	begin
 		# We generate four fields for each document:
 		# - uid, a hash of the filename (including relative path)
@@ -171,9 +171,9 @@ def processFile(filename, options)
 			options.csv << [uid, text, title, url]
 		end
 	rescue => error
-		puts "Error processing #{filename}, skipping."
-		puts error.message
-	  	puts error.backtrace
+		STDERR.write "Error processing #{filename}, skipping.\n"
+		STDERR.write error.message
+	  	STDERR.write error.backtrace
 	end
 end
 
@@ -205,24 +205,25 @@ OptionParser.new do |opts|
 	end	  
 end.parse!
 
-#puts options
-#puts ARGV
+#STDERR.write options
+#STDERR.write ARGV
 
 unless dirname = ARGV[0]
-	puts "ERROR: no directory name specified"
+	STDERR.write "ERROR: no directory name specified\n"
 	exit
 end
 
-unless options.outputfile = ARGV[1]
-	puts "ERROR: no output file specified"
-	exit
+if ARGV[1]
+    options.outputfile = File.open(ARGV[1], "w")
+else
+    options.outputfile = STDOUT
 end
 	
 # ------------------------------------------- Do it! ----------------------------------------
 
 # Open output CSV filename and write header
 if options.process
-	options.csv = CSV.open(options.outputfile,"w")
+	options.csv = CSV.new(options.outputfile)
 	options.csv << ["id", "text", "title", "url"]
 end
 

@@ -24,7 +24,9 @@ JPGs will be OCRd if -o set.
 
 **Typical usage** 
 
-    ruby docs2csv.rb -r -o directory-to-scan output.csv
+    ruby docs2csv.rb -r -o directory-to-scan [outputfile]
+
+If outputfile is omitted, `docs2csv` will write the CSV to `stdout`.
     
 This scans the directory recursively, and OCRs any PDFs which may need it. Other options:
 
