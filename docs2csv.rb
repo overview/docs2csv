@@ -1,3 +1,4 @@
+#!/usr/bin/env ruby
 # Scan a directory for Document files (possibly recursively),
 # Extract text, OCR if needed, 
 # create a .CSV file for use with Overview
