@@ -128,8 +128,7 @@ end
 
 # Based on file extension, is this a document file?
 def matchFn(filename)
-  formats = [".txt", ".pdf", ".html", ".htm", ".mhtml", ".mht", ".doc", ".docx", ".ppt", ".pptx", ".xls", ".xlsx", ".jpg", ".rtf"]
-  return formats.include? File.extname(filename)
+  return File.extname(filename) != '.log'
 end
 
 # strip characters to make sure the CSV is valid
