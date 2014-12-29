@@ -15,6 +15,8 @@ require 'ostruct'
 require 'optparse'
 require 'uri'
 require 'csv'
+require 'filemagic'
+require 'nokogiri'
 
 # ------------------------------------------- Modules, functions ----------------------------------------
 # text extraction, directory recursion, file matching
@@ -40,6 +42,11 @@ def extractTextFromPDF(filename, options)
     text += ocrPDF(filename)
   end
   text
+end
+
+# Extract text from specified HTML.
+def extractTextFromHTML(filename)
+  Nokogiri::HTML(File.open(filename).read).text
 end
 
 # OCR a specific file.
@@ -98,15 +105,15 @@ end
 # extract text from specified file
 # Format dependent
 def extractTextFromFile(filename, options)
-  format = File.extname(filename)
-  if format == ".pdf"
+  mime = FileMagic.mime.file(filename)
+  if mime.start_with?("application/pdf")
     extractTextFromPDF(filename, options)
-  elsif format == ".jpg"
-    ocrImage(filename, options)
-  elsif format == ".txt"
+  elsif mime.start_with?("text/html")
+    extractTextFromHTML(filename)
+  elsif mime.start_with?("text/plain")
     File.open(filename).read
   else
-    extractTextTika(filename)
+    false
   end
 end
 
@@ -163,12 +170,17 @@ def processFile(filename, options)
     # - title, the filename (relative)
     # - url, an http://localhost:8000 URL to the relative path
     if options.process
-      text = cleanText(extractTextFromFile(filename, options))
-      title = filename
-      url = "http://localhost:8000/" + filename
-      uid = Digest::MD5.hexdigest(filename)
+      text = extractTextFromFile(filename, options)
 
-      options.csv << [uid, text, title, url]
+      if text
+        uid = Digest::MD5.hexdigest(filename)
+        text = cleanText(text)
+        title = filename
+        url = "http://localhost:8000/" + filename
+        options.csv << [uid, text, title, url]
+      else
+        STDERR.write "Skipping #{filename}\n"
+      end
     end
   rescue => error
     STDERR.write "Error processing #{filename}, skipping.\n"
