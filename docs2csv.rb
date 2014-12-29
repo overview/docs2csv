@@ -1,13 +1,13 @@
 #!/usr/bin/env ruby
 # Scan a directory for Document files (possibly recursively),
-# Extract text, OCR if needed, 
+# Extract text, OCR if needed,
 # create a .CSV file for use with Overview
 #
 # Example usage:
 #    ruby docs2csv.rb dir-full-of-PDFs output.csv
 #
 # Requires tesseract and poppler for OCR functionality
- 
+
 require 'rubygems'
 require 'digest'
 require 'tmpdir'
@@ -18,7 +18,7 @@ require 'csv'
 
 # ------------------------------------------- Modules, functions ----------------------------------------
 # text extraction, directory recursion, file matching
-  
+
 # is there actually any content to this text? Used to trigger OCR
 # currently, just check for at least one letter. Scans saved to PDF
 # often extract as just a series of form feed (\f) characters
@@ -50,7 +50,7 @@ end
 def ocrFile(filename, tmpdir)
 	ENV['TESSDATA_PREFIX'] = File.expand_path(File.dirname(__FILE__))
 	system("tesseract -psm 1 -l eng \"#{filename}\" \"#{tmpdir}/output\"")
-	File.open("#{tmpdir}/output.txt").read	
+	File.open("#{tmpdir}/output.txt").read
 end
 
 # render and OCR a PDF. Requires splitting it into pages and concatenating
@@ -60,7 +60,7 @@ def ocrPDF(filename)
 	Dir.mktmpdir {|dir|
   		`pdfimages "#{filename}" "#{dir}/img"`
   		Dir.foreach(dir) do |imgfile|
-  			if imgfile != "." && imgfile != ".."	
+  			if imgfile != "." && imgfile != ".."
 	  			STDERR.write "OCRing file #{imgfile}\n"
 	  			begin
 		  			text += ocrFile("#{dir}/#{imgfile}",dir) + '\n'
@@ -79,7 +79,7 @@ end
 # return empty text if OCR option is not set
 def ocrImage(filename, options)
 	text = ""
-	if options.ocr			
+	if options.ocr
 		Dir.mktmpdir {|dir|
 		  	STDERR.write "OCRing file #{filename}\n"
 		  	text = ocrFile(filename, dir)
@@ -92,7 +92,7 @@ end
 # Extract text using Apache Tika. Handles many file formats, including MS Office, HTML
 def extractTextTika(filename)
 	execDir = File.expand_path(File.dirname(__FILE__))
-	text = `java -jar #{execDir}/tika-app-1.4.jar -t "#{filename}"` 
+	text = `java -jar #{execDir}/tika-app-1.4.jar -t "#{filename}"`
 end
 
 # extract text from specified file
@@ -105,7 +105,7 @@ def extractTextFromFile(filename, options)
 		ocrImage(filename, options)
 	elsif format == ".txt"
 		File.open(filename).read
-	else 
+	else
 		extractTextTika(filename)
 	end
 end
@@ -132,14 +132,14 @@ def matchFn(filename)
 	return formats.include? File.extname(filename)
 end
 
-# strip characters to make sure the CSV is valid  
+# strip characters to make sure the CSV is valid
 def cleanText(text)
    # force clean UTF-8 encoding, if the version of Ruby we're on supports it
    # Actually we assume UTF-8 here, may not be correct
    if RUBY_VERSION >= "1.9"
 
       # First, force to UTF-8 encoding
-      if text.encoding.name != "UTF-8"  
+      if text.encoding.name != "UTF-8"
         text = text.force_encoding('UTF-8')
       end
 
@@ -148,7 +148,7 @@ def cleanText(text)
         text = text.encode('UTF-16', invalid: :replace, undef: :replace).encode('UTF-8')
       end
 
-    end	
+    end
 	text.gsub!("\f", "\n") # turn \f into \n
 	text.gsub("\x00", "")  # remove null bytes (See https://www.pivotaltracker.com/story/show/61360820)
 end
@@ -161,14 +161,14 @@ def processFile(filename, options)
 		# We generate four fields for each document:
 		# - uid, a hash of the filename (including relative path)
 		# - text, the extracted text
-		# - title, the filename (relative)  
+		# - title, the filename (relative)
 		# - url, an http://localhost:8000 URL to the relative path
 		if options.process
 			text = cleanText(extractTextFromFile(filename, options))
 			title = filename
 			url = "http://localhost:8000/" + filename
 			uid = Digest::MD5.hexdigest(filename)
-			
+
 			options.csv << [uid, text, title, url]
 		end
 	rescue => error
@@ -191,19 +191,19 @@ OptionParser.new do |opts|
 
 	opts.on("-l", "--list", "Only list files, do not process") do |v|
 		options.process = false
-	end	  
+	end
 
 	opts.on("-o", "--ocr", "OCR image files and pdfs that do not contain text") do |v|
 		options.ocr = true
-	end	  
+	end
 
 	opts.on("-f", "--force-ocr", "Force OCR on all pdfs") do |v|
 		options.force_ocr = true
-	end	  
+	end
 
 	opts.on("-r", "--recurse", "Scan directory recursively") do |v|
 		options.recurse = true
-	end	  
+	end
 end.parse!
 
 #STDERR.write options
@@ -219,7 +219,7 @@ if ARGV[1]
 else
     options.outputfile = STDOUT
 end
-	
+
 # ------------------------------------------- Do it! ----------------------------------------
 
 # Open output CSV filename and write header
