@@ -92,7 +92,7 @@ end
 # Extract text using Apache Tika. Handles many file formats, including MS Office, HTML
 def extractTextTika(filename)
 	execDir = File.expand_path(File.dirname(__FILE__))
-	text = `java -jar #{execDir}/tika-app-1.4.jar -t "#{filename}"` 
+	text = `java -Djava.awt.headless=true -jar #{execDir}/tika-app-1.4.jar -t "#{filename}"`
 end
 
 # extract text from specified file
